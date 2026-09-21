@@ -3,6 +3,7 @@
 
 #include "game/World.h"
 #include "render/Renderer.h"
+#include "systems/InputSystem.h"
 
 int main()
 {
@@ -25,6 +26,9 @@ int main()
     // Create the renderer responsible for drawing the game world.
     Renderer renderer;
 
+    // Create the input system responsible for handling keyboard input.
+    InputSystem inputSystem;
+
     // Create the SDL window, renderer and load resources.
     if (!renderer.Initialize())
     {
@@ -37,7 +41,11 @@ int main()
     // Controls the main application loop.
     bool isRunning = true;
 
+    // Variable containing SDL events.
     SDL_Event event;
+
+    // Used to calculate delta time.
+    Uint64 previousTick = SDL_GetTicks();
 
     // Main application loop.
     while (isRunning)
@@ -51,6 +59,16 @@ int main()
                 isRunning = false;
             }
         }
+
+        // Calculate frame delta time in seconds.
+        Uint64 currentTick = SDL_GetTicks();
+
+        float deltaTime = static_cast<float>(currentTick - previousTick) / 1000.0f;
+
+        previousTick = currentTick;
+
+        // Update tank movement and rotation based on keyboard input.
+        inputSystem.Update(world, deltaTime);
 
         // Render the current game state.
         renderer.Render(world);

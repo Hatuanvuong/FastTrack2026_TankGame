@@ -316,6 +316,33 @@ void Renderer::DrawTank(const Tank& tank)
         texture = m_player2TankTexture;
     }
 
+    // Convert the tank facing direction to an SDL rotation angle.
+    // The tank texture is designed to face Up by default (0 degrees).
+    double angle = 0.0;
+
+    switch (tank.direction)
+    {
+    // Render the texture at 0 degrees.
+    case Up:
+        angle = 0.0;
+        break;
+    
+    // Render the texture at 90 degrees.
+    case Right:
+        angle = 90.0;
+        break;
+
+    // Render the texture at 180 degrees.
+    case Down:
+        angle = 180.0;
+        break;
+
+    // Render the texture at 270 degrees.
+    case Left:
+        angle = 270.0;
+        break;
+    }
+
     SDL_FRect tankRect =
     {
         tank.x,
@@ -323,15 +350,18 @@ void Renderer::DrawTank(const Tank& tank)
         // Offset tank position by HUD height so that
         // tanks are rendered inside the map area.
         tank.y + Constants::HUD_HEIGHT,
-
+        
         static_cast<float>(Constants::TANK_SIZE),
         static_cast<float>(Constants::TANK_SIZE)
     };
 
-    // Draw the tank texture.
-    SDL_RenderTexture(
+    // Render the tank using the current rotation angle.
+    SDL_RenderTextureRotated(
         m_renderer,
         texture,
         nullptr,
-        &tankRect);
+        &tankRect,
+        angle,
+        nullptr,
+        SDL_FLIP_NONE);
 }

@@ -31,6 +31,8 @@ add_executable(
     src/game/World.cpp
 
     src/render/Renderer.cpp
+
+    src/systems/InputSystem.cpp
 )
 
 target_link_libraries(
