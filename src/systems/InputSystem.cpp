@@ -2,9 +2,14 @@
 
 #include <SDL3/SDL.h>
 #include "../core/Constants.h"
+#include "BulletSystem.h"
 
 void InputSystem::Update(World& world, float deltaTime)
 {
+    // Update fire cooldown timers.
+    world.player1Tank.fireCooldownTimer += deltaTime;
+    world.player2Tank.fireCooldownTimer += deltaTime;
+
     // Get the current state of all keyboard keys.
     const bool* keyboardState = SDL_GetKeyboardState(nullptr);
 
@@ -101,6 +106,46 @@ void InputSystem::Update(World& world, float deltaTime)
             world.player2Tank.x = nextX;
         }
     }
+}
+
+void InputSystem::HandleFireInput(World& world,
+                                  const SDL_Event& event,
+                                  BulletSystem& bulletSystem)
+{
+    // Ignore non-keyboard events.
+    if (event.type != SDL_EVENT_KEY_DOWN)
+    {
+        return;
+    }
+
+    // Player 1 fires a bullet using the Space key.
+    if (event.key.scancode == SDL_SCANCODE_SPACE)
+    {
+        if (world.player1Tank.fireCooldownTimer >= Constants::FIRE_COOLDOWN)
+        {
+            bulletSystem.Fire(
+            world.player1Bullets,
+            world.player1Tank);
+
+            // Reset the cooldown timer after firing.
+            world.player1Tank.fireCooldownTimer = 0.0f;
+        }
+    }
+
+    // Player 2 fires a bullet using the Enter key.
+    if (event.key.scancode == SDL_SCANCODE_RETURN)
+    {
+        if (world.player2Tank.fireCooldownTimer >= Constants::FIRE_COOLDOWN)
+        {
+            bulletSystem.Fire(
+                world.player2Bullets,
+                world.player2Tank);
+
+            // Reset the cooldown timer after firing.
+            world.player2Tank.fireCooldownTimer = 0.0f;
+        }
+    }
+
 }
 
 bool InputSystem::IsMapCollision(const World& world,

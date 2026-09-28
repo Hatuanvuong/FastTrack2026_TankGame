@@ -2,6 +2,7 @@
 
 #include "../core/Direction.h"
 #include "../core/PlayerId.h"
+#include "../core/Constants.h"
 
 // Represents a bullet fired by a tank.
 struct Bullet
@@ -18,6 +19,9 @@ struct Bullet
     // Owner of the bullet.
     PlayerId owner;
 
+    // Movement speed in pixels per second.
+    float speed;
+
     // Indicates whether the bullet is currently active.
     // true  : bullet exists in the game world
     // false : bullet is inactive or destroyed
@@ -32,6 +36,8 @@ struct Bullet
         direction = Up;
 
         owner = Player1;
+
+        speed = Constants::BULLET_SPEED;
 
         active = false;
     }

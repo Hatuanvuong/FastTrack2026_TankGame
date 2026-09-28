@@ -25,6 +25,9 @@ struct Tank
     // Movement speed in pixels per second.
     float speed;
 
+    // Time elapsed since the last bullet was fired.
+    float fireCooldownTimer;
+
     // Creates a tank with default values defined by the game specification.
     Tank()
     {
@@ -38,5 +41,7 @@ struct Tank
         playerId = Player1;
 
         speed = Constants::TANK_SPEED;
+
+        fireCooldownTimer = Constants::FIRE_COOLDOWN;
     }
 };

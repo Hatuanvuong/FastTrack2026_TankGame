@@ -30,7 +30,7 @@ namespace Constants
     const float PLAYER2_SPAWN_Y = 576.0f;
 
     // Bullet
-    const int BULLET_SIZE = 8;
+    const int BULLET_SIZE = 16;
     const int BULLET_DAMAGE = 5;
     const float BULLET_SPEED = 500.0f;
 

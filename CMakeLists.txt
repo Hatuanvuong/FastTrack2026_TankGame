@@ -33,6 +33,8 @@ add_executable(
     src/render/Renderer.cpp
 
     src/systems/InputSystem.cpp
+
+    src/systems/BulletSystem.cpp
 )
 
 target_link_libraries(

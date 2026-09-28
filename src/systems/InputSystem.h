@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../game/World.h"
+#include "BulletSystem.h"
+#include <SDL3/SDL.h>
 
 // Responsible for handling keyboard input.
 class InputSystem
@@ -8,6 +10,11 @@ class InputSystem
 public:
     // Updates tank movement and rotation.
     void Update(World& world, float deltaTime);
+
+    // Handles bullet firing input.
+    void HandleFireInput(World& world,
+                         const SDL_Event& event,
+                         BulletSystem& bulletSystem);
 
 private:
     // Checks whether the tank can move to the next position.

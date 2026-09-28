@@ -4,6 +4,7 @@
 #include <SDL3_ttf/SDL_ttf.h>
 
 #include "../game/World.h"
+#include "../entity/Bullet.h"
 
 // Responsible for rendering the game world.
 class Renderer
@@ -35,6 +36,9 @@ private:
     // Draws a tank.
     void DrawTank(const Tank& tank);
 
+    // Draws a bullet.
+    void DrawBullet(const Bullet& bullet);
+
 private:
     // Main application window.
     SDL_Window* m_window;
@@ -49,6 +53,9 @@ private:
     // Tank textures.
     SDL_Texture* m_player1TankTexture;
     SDL_Texture* m_player2TankTexture;
+
+    // Bullet texture.
+    SDL_Texture* m_bulletTexture;
 
     // Font used to render HUD text.
     TTF_Font* m_hudFont;

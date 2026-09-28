@@ -4,6 +4,7 @@
 #include "game/World.h"
 #include "render/Renderer.h"
 #include "systems/InputSystem.h"
+#include "systems/BulletSystem.h"
 
 int main()
 {
@@ -28,6 +29,9 @@ int main()
 
     // Create the input system responsible for handling keyboard input.
     InputSystem inputSystem;
+
+    // Create the bullet system responsible for bullet spawning and movement.
+    BulletSystem bulletSystem;
 
     // Create the SDL window, renderer and load resources.
     if (!renderer.Initialize())
@@ -58,6 +62,12 @@ int main()
             {
                 isRunning = false;
             }
+
+            // Handle bullet firing input.
+            inputSystem.HandleFireInput(
+                world,
+                event,
+                bulletSystem);
         }
 
         // Calculate frame delta time in seconds.
@@ -69,6 +79,9 @@ int main()
 
         // Update tank movement and rotation based on keyboard input.
         inputSystem.Update(world, deltaTime);
+
+        // Update bullet movement.
+        bulletSystem.Update(world, deltaTime);
 
         // Render the current game state.
         renderer.Render(world);

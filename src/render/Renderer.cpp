@@ -18,6 +18,8 @@ Renderer::Renderer()
     m_player1TankTexture = nullptr;
     m_player2TankTexture = nullptr;
 
+    m_bulletTexture = nullptr;
+
     m_hudFont = nullptr;
 }
 
@@ -99,6 +101,16 @@ bool Renderer::LoadResources()
         return false;
     }
 
+    // Load Bullet texture from PNG file.
+    m_bulletTexture = IMG_LoadTexture(
+        m_renderer,
+        "assets/images/bullet/bullet.png");
+        
+    if (m_bulletTexture == nullptr)
+    {
+        return false;
+    }
+
     // Open the font used to render HUD text.
     // Parameters:
     // - File path
@@ -150,6 +162,13 @@ void Renderer::Shutdown()
         m_borderWallTexture = nullptr;
     }
 
+    // Release bullet textures.
+    if (m_bulletTexture != nullptr)
+    {
+        SDL_DestroyTexture(m_bulletTexture);
+        m_bulletTexture = nullptr;
+    }
+
     // Release SDL renderer.
     if (m_renderer != nullptr)
     {
@@ -180,6 +199,18 @@ void Renderer::Render(const World& world)
 
     DrawTank(world.player1Tank);
     DrawTank(world.player2Tank);
+
+    // Render all active bullets fired by Player 1.
+    for (const Bullet& bullet : world.player1Bullets)
+    {
+        DrawBullet(bullet);
+    }
+
+    // Render all active bullets fired by Player 2.
+    for (const Bullet& bullet : world.player2Bullets)
+    {
+        DrawBullet(bullet);
+    }
 
     // Display the completed frame on screen.
     // Everything rendered before this call is stored in the back buffer.
@@ -364,4 +395,31 @@ void Renderer::DrawTank(const Tank& tank)
         angle,
         nullptr,
         SDL_FLIP_NONE);
+}
+
+void Renderer::DrawBullet(const Bullet& bullet)
+{
+    // Inactive bullets do not need rendering.
+    if (!bullet.active)
+    {
+        return;
+    }
+
+    SDL_FRect bulletRect =
+    {
+        bullet.x,
+
+        // Offset bullet position by HUD height so that bullets are rendered inside the map area.
+        bullet.y + Constants::HUD_HEIGHT,
+
+        static_cast<float>(Constants::BULLET_SIZE),
+        static_cast<float>(Constants::BULLET_SIZE)
+    };
+
+    // Draw the bullet texture at its destination rectangle.
+    SDL_RenderTexture(
+        m_renderer,
+        m_bulletTexture,
+        nullptr,
+        &bulletRect);
 }
