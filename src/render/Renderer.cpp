@@ -5,6 +5,9 @@
 #include "../core/Constants.h"
 #include "../core/PlayerId.h"
 #include "../core/TileType.h"
+#include <sstream>
+#include <iomanip>
+#include <string>
 
 Renderer::Renderer()
 {
@@ -193,7 +196,7 @@ void Renderer::Render(const World& world)
     SDL_RenderClear(m_renderer);
 
     // Draw objects in render order.
-    DrawHud();
+    DrawHud(world);
 
     DrawMap(world.map);
 
@@ -212,12 +215,18 @@ void Renderer::Render(const World& world)
         DrawBullet(bullet);
     }
 
+    // Draws game over overlay.
+    if (world.gameState != Playing)
+    {
+        DrawGameOverScreen(world);
+    }
+
     // Display the completed frame on screen.
     // Everything rendered before this call is stored in the back buffer.
     SDL_RenderPresent(m_renderer);
 }
 
-void Renderer::DrawHud()
+void Renderer::DrawHud(const World& world)
 {
     // Set the color used by SDL_RenderFillRect().
     SDL_SetRenderDrawColor(m_renderer, 70, 70, 70, 255);
@@ -233,18 +242,42 @@ void Renderer::DrawHud()
     // Draw a filled rectangle used as HUD background.
     SDL_RenderFillRect(m_renderer, &hudRect);
 
+    // Convert the remaining match time from seconds to MM:SS format.
+    int totalSeconds = static_cast<int>(world.remainingTime);
+
+    int minutes = totalSeconds / 60;
+
+    int seconds = totalSeconds % 60;
+
+    // Build the HUD text using the current HP values and remaining match time.
+    std::ostringstream textStream;
+
+    textStream
+        << "P1 HP: "
+        << world.player1Tank.hp
+        << "      TIME: "
+        << std::setw(2)
+        << std::setfill('0')
+        << minutes
+        << ":"
+        << std::setw(2)
+        << std::setfill('0')
+        << seconds
+        << "      P2 HP: "
+        << world.player2Tank.hp;
+
+    std::string hudText = textStream.str();
+
     // White color used for HUD text.
     SDL_Color textColor = {255, 255, 255, 255};
 
     // Render text into an SDL_Surface.
-    // SDL_Surface:
-    // - Stored in CPU memory
-    // - Represents an image containing the generated text
-    SDL_Surface* textSurface = TTF_RenderText_Blended(
-        m_hudFont,
-        "P1 HP: 100      TIME: 05:00      P2 HP: 100",
-        0,
-        textColor);
+    SDL_Surface* textSurface =
+        TTF_RenderText_Blended(
+            m_hudFont,
+            hudText.c_str(),
+            0,
+            textColor);
 
     if (textSurface == nullptr)
     {
@@ -252,9 +285,6 @@ void Renderer::DrawHud()
     }
 
     // Convert the surface into a texture.
-    // SDL_Texture:
-    // - Stored in GPU memory
-    // - Can be rendered using SDL_RenderTexture()
     SDL_Texture* textTexture =
         SDL_CreateTextureFromSurface(m_renderer, textSurface);
 
@@ -264,6 +294,7 @@ void Renderer::DrawHud()
         return;
     }
 
+    // Position the HUD text inside the HUD background area.
     SDL_FRect textRect =
     {
         20.0f,
@@ -422,4 +453,100 @@ void Renderer::DrawBullet(const Bullet& bullet)
         m_bulletTexture,
         nullptr,
         &bulletRect);
+}
+
+void Renderer::DrawGameOverScreen(const World& world)
+{
+    // Draw a semi-transparent black overlay.
+    SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_BLEND);
+
+    SDL_SetRenderDrawColor(
+        m_renderer,
+        0,
+        0,
+        0,
+        180);
+
+    SDL_FRect overlay =
+    {
+        0.0f,
+        0.0f,
+        static_cast<float>(Constants::WINDOW_WIDTH),
+        static_cast<float>(Constants::WINDOW_HEIGHT)
+    };
+
+    SDL_RenderFillRect(m_renderer, &overlay);
+
+    std::string text;
+
+    // Select the match result text.
+    if (world.gameState == Player1Victory)
+    {
+        text = "PLAYER 1 WINS - PRESS R TO RESTART";
+    }
+    else if (world.gameState == Player2Victory)
+    {
+        text = "PLAYER 2 WINS - PRESS R TO RESTART";
+    }
+    else if (world.gameState == Draw)
+    {
+        text = "DRAW - PRESS R TO RESTART";
+    }
+    else
+    {
+        return;
+    }
+
+    SDL_Color textColor =
+    {
+        255,
+        255,
+        255,
+        255
+    };
+
+    // Render the result text into a surface.
+    SDL_Surface* textSurface =
+        TTF_RenderText_Blended(
+            m_hudFont,
+            text.c_str(),
+            0,
+            textColor);
+
+    if (textSurface == nullptr)
+    {
+        return;
+    }
+
+    // Convert the surface into a texture.
+    SDL_Texture* textTexture =
+        SDL_CreateTextureFromSurface(
+            m_renderer,
+            textSurface);
+
+    if (textTexture == nullptr)
+    {
+        SDL_DestroySurface(textSurface);
+        return;
+    }
+
+    SDL_FRect textRect =
+    {
+        (Constants::WINDOW_WIDTH - textSurface->w) * 0.5f,
+
+        (Constants::WINDOW_HEIGHT - textSurface->h) * 0.5f,
+
+        static_cast<float>(textSurface->w),
+        static_cast<float>(textSurface->h)
+    };
+
+    // Draw the result text at the center of the screen.
+    SDL_RenderTexture(
+        m_renderer,
+        textTexture,
+        nullptr,
+        &textRect);
+
+    SDL_DestroyTexture(textTexture);
+    SDL_DestroySurface(textSurface);
 }

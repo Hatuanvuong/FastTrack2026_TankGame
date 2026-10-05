@@ -35,6 +35,8 @@ add_executable(
     src/systems/InputSystem.cpp
 
     src/systems/BulletSystem.cpp
+
+    src/systems/MatchSystem.cpp
 )
 
 target_link_libraries(

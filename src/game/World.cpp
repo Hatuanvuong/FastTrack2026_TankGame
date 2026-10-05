@@ -1,6 +1,6 @@
 #include "World.h"
-
 #include "../core/Constants.h"
+#include "../core/GameState.h"
 
 World::World()
 {
@@ -33,5 +33,9 @@ void World::Initialize()
 
     player2Tank.speed = Constants::TANK_SPEED;
 
-    // This can be expanded later: Initialize Bullets, Timer, GameState
+    // Initialize match timer.
+    remainingTime = static_cast<float>(Constants::MATCH_DURATION_SECONDS);
+
+    // Initialize game state.
+    gameState = Playing;
 }

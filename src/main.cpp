@@ -1,10 +1,10 @@
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
-
 #include "game/World.h"
 #include "render/Renderer.h"
 #include "systems/InputSystem.h"
 #include "systems/BulletSystem.h"
+#include "systems/MatchSystem.h"
 
 int main()
 {
@@ -32,6 +32,9 @@ int main()
 
     // Create the bullet system responsible for bullet spawning and movement.
     BulletSystem bulletSystem;
+
+    // Create the match system responsible for timer and win conditions.
+    MatchSystem matchSystem;
 
     // Create the SDL window, renderer and load resources.
     if (!renderer.Initialize())
@@ -68,6 +71,15 @@ int main()
                 world,
                 event,
                 bulletSystem);
+            
+            // Restart the match when the player presses R after the current match has ended.
+            if (event.type == SDL_EVENT_KEY_DOWN)
+            {
+                if (event.key.scancode == SDL_SCANCODE_R && world.gameState != Playing)
+                {
+                    matchSystem.Restart(world);
+                }
+            }
         }
 
         // Calculate frame delta time in seconds.
@@ -82,6 +94,9 @@ int main()
 
         // Update bullet movement.
         bulletSystem.Update(world, deltaTime);
+
+        // Update match rules.
+        matchSystem.Update(world, deltaTime);
 
         // Render the current game state.
         renderer.Render(world);

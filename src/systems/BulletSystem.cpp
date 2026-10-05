@@ -22,6 +22,12 @@ void BulletSystem::Fire(std::vector<Bullet>& bullets, const Tank& tank)
 
 void BulletSystem::Update(World& world, float deltaTime)
 {
+    // Ignore gameplay updates after the match ends.
+    if (world.gameState != Playing)
+    {
+        return;
+    }
+
     // Update bullets fired by Player 1.
     for (Bullet& bullet : world.player1Bullets)
     {

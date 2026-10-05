@@ -4,6 +4,7 @@
 #include "../entity/Tank.h"
 #include "../entity/Bullet.h"
 #include <vector>
+#include "../core/GameState.h"
 
 // Represents the current game world. World contains all gameplay data that belongs to a match.
 class World
@@ -26,7 +27,11 @@ public:
     // Bullet fired by Player 2.
     std::vector<Bullet> player2Bullets;
 
-    // This can be expanded later: Timer, GameState
+    // Remaining match time in seconds.
+    float remainingTime;
+
+    // Current match state.
+    GameState gameState;
 
 private:
     // Initializes all world objects.

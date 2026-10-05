@@ -6,6 +6,12 @@
 
 void InputSystem::Update(World& world, float deltaTime)
 {
+    // Ignore gameplay updates after the match ends.
+    if (world.gameState != Playing)
+    {
+        return;
+    }
+
     // Update fire cooldown timers.
     world.player1Tank.fireCooldownTimer += deltaTime;
     world.player2Tank.fireCooldownTimer += deltaTime;

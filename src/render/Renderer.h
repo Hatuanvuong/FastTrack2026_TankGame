@@ -2,7 +2,6 @@
 
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
-
 #include "../game/World.h"
 #include "../entity/Bullet.h"
 
@@ -28,7 +27,7 @@ private:
     bool LoadResources();
 
     // Draws the HUD area.
-    void DrawHud();
+    void DrawHud(const World& world);
 
     // Draws all map tiles.
     void DrawMap(const Map& map);
@@ -38,6 +37,9 @@ private:
 
     // Draws a bullet.
     void DrawBullet(const Bullet& bullet);
+
+    // Draws game over overlay.
+    void DrawGameOverScreen(const World& world);
 
 private:
     // Main application window.
