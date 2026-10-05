@@ -14,5 +14,14 @@ public:
 
 private:
     // Updates a single bullet.
-    void UpdateBullet(Bullet& bullet, float deltaTime);
+    void UpdateBullet(World& world, Bullet& bullet, float deltaTime);
+
+    // Checks whether the bullet collides with BorderWall or ObstacleWall.
+    bool IsMapCollision(const World& world, const Bullet& bullet) const;
+    
+    // Checks whether the bullet collides with a tank.
+    bool IsTankCollision(const Bullet& bullet, const Tank& tank) const;
+
+    // Removes destroyed bullets from a bullet list.
+    void RemoveInactiveBullets(std::vector<Bullet>& bullets);
 };
